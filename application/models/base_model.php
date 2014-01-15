@@ -49,6 +49,7 @@ class Base_model extends CI_Model
         if (!is_array($params)) {
             throw new InvalidArgumentException('params can be array only. Input was: '.$params);
         }
+        $options['limit'] = null;
         return $this->find_one($params, $options);
     }
 
@@ -58,6 +59,7 @@ class Base_model extends CI_Model
             throw new InvalidArgumentException('params can be array only. Input was: '.$params);
         }
         $options['return_type'] = 'array';
+        $options['limit'] = null;
         return $this->find_one($params, $options);
     }
 
@@ -89,6 +91,7 @@ class Base_model extends CI_Model
         if($table)
         {
             $options['table'] = $table;
+            $options['limit'] = null;
             return $this->find_one($params, $options);
         }
         throw new UnexpectedValueException('table parameter cannot be NULL');
