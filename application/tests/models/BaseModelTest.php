@@ -216,10 +216,210 @@ class BaseModelTest extends CIUnit_TestCase
         $result = $this->base_model->find_one(9);
         $this->assertEquals(100, $result);
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_delete_throws_invalid_argument_exception()
+    {
+        $this->base_model->delete('string');
+    }
+
+    public function test_delete_calls_db_insert_with_correct_params()
+    {
+        $this->mock->expects($this->any())
+            ->method('delete')
+            ->with(
+                $this->equalTo('table'),
+                $this->equalTo(array('id' => 9))
+            );
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $this->base_model->delete(array('id' => 9));
+    }
+
+    public function test_delete_calls_delete_with_correct_parameters_when_integer_is_passed()
+    {
+        $this->mock->expects($this->any())
+            ->method('delete')
+            ->with(
+                $this->equalTo('table'),
+                $this->equalTo(array('id' => 9))
+            );
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $this->base_model->delete(9);
+    }
+
+    public function test_delete_calls_delete_with_correct_parameters_when_array_is_passed()
+    {
+        $this->mock->expects($this->any())
+            ->method('delete')
+            ->with(
+                $this->equalTo('table'),
+                $this->equalTo(array())
+            );
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $this->base_model->delete(array());
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function test_find_one_as_array_returns_correct_value()
+    {
+        $query_mock = $this->getMockBuilder('Fake_CI_DB_result')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query_mock->expects($this->any())
+            ->method('find_one')
+            ->will($this->returnValue(array(100, 200)));
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $result = $this->base_model->find_one_as_array(12);
+        $this->assertEquals(100, $result);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_find_all_throws_invalid_argument_exception()
+    {
+        $this->mock->expects($this->any())
+        ->method('find_all')
+        ->with(
+            $this->equalTo(array())
+        );
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $this->base_model->find_all(9);
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function test_find_all_returns_correct_value()
+    {
+        $query_mock = $this->getMockBuilder('Fake_CI_DB_result')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query_mock->expects($this->any())
+            ->method('find_one')
+            ->will($this->returnValue(array(100, 200)));
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $result = $this->base_model->find_all(array());
+        $this->assertEquals(100, $result);
+    }
+
+    public function test_find_all_calls_result_with_type_equals_object()
+    {
+        $query_mock = $this->getMockBuilder('Fake_CI_DB_result')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query_mock->expects($this->any())
+            ->method('result')
+            ->with($this->equalTo('object'));
+
+        $this->mock->expects($this->any())
+            ->method('get_where')
+            ->will($this->returnValue($query_mock));
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $this->base_model->find_all(array('id' => 4));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_find_all_as_array_throws_invalid_argument_exception()
+    {
+        $this->mock->expects($this->any())
+            ->method('find_all_as_array')
+            ->with(
+                $this->equalTo(array())
+            );
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $this->base_model->find_all_as_array(9);
+    }
+
+    public function test_find_all_as_array_calls_result_with_type_equals_object()
+    {
+        $query_mock = $this->getMockBuilder('Fake_CI_DB_result')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query_mock->expects($this->any())
+            ->method('result')
+            ->with($this->equalTo('array'));
+
+        $this->mock->expects($this->any())
+            ->method('get_where')
+            ->will($this->returnValue($query_mock));
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $this->base_model->find_all_as_array(array('id' => 4));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_find_all_on_table_throws_invalid_argument_exception()
+    {
+        $this->mock->expects($this->any())
+            ->method('find_all_on_table')
+            ->with(
+                $this->equalTo(array())
+            );
+
+        $this->base_model->db = $this->mock;
+        $this->base_model->find_all_on_table(9, 'table');
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function test_find_all_on_table_null_table_parameter()
+    {
+        $this->base_model->find_all_on_table(array(), null, array());
+    }
+
+    public function test_find_all_on_table_calls_result_with_type_equals_object()
+    {
+        $query_mock = $this->getMockBuilder('Fake_CI_DB_result')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query_mock->expects($this->any())
+            ->method('result')
+            ->with($this->equalTo('object'));
+
+        $this->mock->expects($this->any())
+            ->method('get_where')
+            ->will($this->returnValue($query_mock));
+
+        $this->base_model->db = $this->mock;
+        $this->base_model->find_all_on_table(array('id' => 4), 'table');
+    }
+
 }
 
 class Fake_CI_DB_result
 {
     function result() {}
     function result_array() {}
+    function find_one(){}
 }

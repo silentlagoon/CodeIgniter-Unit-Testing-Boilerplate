@@ -44,27 +44,16 @@ class Base_model extends CI_Model
         if (!is_array($params)) {
             throw new InvalidArgumentException('params can be array only. Input was: '.$params);
         }
-
-        $options = array_merge(
-            array(
-                'result_as_array' => FALSE,
-                'table' => $this->_table
-            ),$options);
-
-        $query = $this->db->get_where($options['table'], $params);
-        if ($options['result_as_array'] === TRUE) {
-            $result = $query->result_array();
-        } else {
-            $result = $query->result();
-        }
-
-        return $result;
+        return $this->find_one($params, $options);
     }
 
     function find_all_as_array($params, $options = array())
     {
-        $options['result_as_array'] = TRUE;
-        return $this->find_all($params, $options);
+        if (!is_array($params)) {
+            throw new InvalidArgumentException('params can be array only. Input was: '.$params);
+        }
+        $options['return_type'] = 'array';
+        return $this->find_one($params, $options);
     }
 
     function create($params)
@@ -78,10 +67,10 @@ class Base_model extends CI_Model
     function delete($options)
     {
         if (is_int($options)) {
-            $this->db->where('id', $options)->delete($this->_table);
+            $this->db->delete($this->_table, array('id' => $options));
         }
         else if (is_array($options)) {
-            $this->db->where($options)->delete($this->_table);
+            $this->db->delete($this->_table, $options);
         } else {
             throw new InvalidArgumentException('options can be integer or array only. Input was: '.$options);
         }
@@ -89,7 +78,14 @@ class Base_model extends CI_Model
 
     function find_all_on_table($params, $table, $options = array())
     {
-        $options['table'] = $table;
-        return $this->find_all($params, $options);
+        if (!is_array($params)) {
+            throw new InvalidArgumentException('params can be array only. Input was: '.$params);
+        }
+        if($table)
+        {
+            $options['table'] = $table;
+            return $this->find_one($params, $options);
+        }
+        throw new UnexpectedValueException('table parameter cannot be NULL');
     }
 }
