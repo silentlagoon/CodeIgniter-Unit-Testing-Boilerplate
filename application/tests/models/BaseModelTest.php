@@ -217,6 +217,26 @@ class BaseModelTest extends CIUnit_TestCase
         $this->assertEquals(100, $result);
     }
 
+    public function test_find_one_returns_correct_value_if_returns_more_then_one_result()
+    {
+        $query_mock = $this->getMockBuilder('Fake_CI_DB_result')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query_mock->expects($this->any())
+            ->method('result')
+            ->will($this->returnValue(array(100, 200)));
+
+        $this->mock->expects($this->any())
+            ->method('get_where')
+            ->will($this->returnValue($query_mock));
+
+        $this->base_model->_table = 'table';
+        $this->base_model->db = $this->mock;
+        $result = $this->base_model->find_one(9, array(), null);
+        $this->assertEquals(array(100, 200), $result);
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */

@@ -7,20 +7,21 @@ class Base_model extends CI_Model
         parent::__construct();
     }
 
-    function find_one($params, $options = array())
+    function find_one($params, $options = array(), $limit=1)
     {
         $options = array_merge(
             array(
                 'return_type' => 'object',
-                'table' => $this->_table
+                'table' => $this->_table,
+                'limit' => $limit
             ),$options);
 
         $query = NULL;
         if (is_int($params)) {
-            $query = $this->db->get_where($options['table'], array('id' => $params), 1);
+            $query = $this->db->get_where($options['table'], array('id' => $params), $options['limit']);
         }
         elseif (is_array($params)) {
-            $query = $this->db->get_where($options['table'], $params, 1);
+            $query = $this->db->get_where($options['table'], $params, $options['limit']);
         } else {
             throw new InvalidArgumentException('params can be integer or array only. Input was: '.$params);
         }
@@ -30,7 +31,11 @@ class Base_model extends CI_Model
         }
 
         $result = $query->result($options['return_type']);
-        return count($result) > 0 ? $result[0] : NULL;
+        if($options['limit'])
+        {
+            return count($result) > 0 ? $result[0] : NULL;
+        }
+        return count($result) > 0 ? $result : NULL;
     }
 
     function find_one_as_array($params, $options = array())
