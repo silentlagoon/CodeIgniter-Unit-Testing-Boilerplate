@@ -434,7 +434,6 @@ class BaseModelTest extends CIUnit_TestCase
         $this->base_model->db = $this->mock;
         $this->base_model->find_all_on_table(array('id' => 4), 'table');
     }
-
 }
 
 class Fake_CI_DB_result
