@@ -7,6 +7,14 @@ class Base_model extends CI_Model
         parent::__construct();
     }
 
+    /**
+     * @param $params
+     * @param array $options
+     * @param int $limit
+     * @return null
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     */
     function find_one($params, $options = array(), $limit=1)
     {
         $options = array_merge(
@@ -38,12 +46,23 @@ class Base_model extends CI_Model
         return count($result) > 0 ? $result : NULL;
     }
 
+    /**
+     * @param $params
+     * @param array $options
+     * @return null
+     */
     function find_one_as_array($params, $options = array())
     {
         $options['return_type'] = 'array';
         return $this->find_one($params, $options);
     }
 
+    /**
+     * @param $params
+     * @param array $options
+     * @return null
+     * @throws InvalidArgumentException
+     */
     function find_all($params, $options = array())
     {
         if (!is_array($params)) {
@@ -53,6 +72,12 @@ class Base_model extends CI_Model
         return $this->find_one($params, $options);
     }
 
+    /**
+     * @param $params
+     * @param array $options
+     * @return null
+     * @throws InvalidArgumentException
+     */
     function find_all_as_array($params, $options = array())
     {
         if (!is_array($params)) {
@@ -63,6 +88,10 @@ class Base_model extends CI_Model
         return $this->find_one($params, $options);
     }
 
+    /**
+     * @param $params
+     * @throws InvalidArgumentException
+     */
     function create($params)
     {
         if (!is_array($params)) {
@@ -71,6 +100,10 @@ class Base_model extends CI_Model
         $this->db->insert($this->_table, $params);
     }
 
+    /**
+     * @param $options
+     * @throws InvalidArgumentException
+     */
     function delete($options)
     {
         if (is_int($options)) {
@@ -83,6 +116,30 @@ class Base_model extends CI_Model
         }
     }
 
+    /**
+     * @param $params
+     * @throws InvalidArgumentException
+     */
+    public function update($params)
+    {
+        if (is_int($params)) {
+            $this->db->update($this->table, array('id' => $params));
+        }
+        else if (is_array($params)) {
+            $this->db->update($this->table, $params);
+        } else {
+            throw new InvalidArgumentException('Options can be integer or array only. Input was: '.$params);
+        }
+    }
+
+    /**
+     * @param $params
+     * @param $table
+     * @param array $options
+     * @return null
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     */
     function find_all_on_table($params, $table, $options = array())
     {
         if (!is_array($params)) {
